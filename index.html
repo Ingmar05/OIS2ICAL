@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ÕIS to iCal Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        #container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            color: #666;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h2>ÕIS to iCal Converter</h2>
+        <p>Convert calendar from student.taltech.ee to iCal</p>
+        <p>Paste your JSON data below:</p>
+        <textarea id="jsonInput" rows="10" cols="50"></textarea>
+        <br>
+        <button id="convertButton">Convert to iCal</button>
+        <a id="downloadLink" style="display: none;">Download iCal File</a>
+    </div>
+
+    <script>
+        function escapeText(text) {
+            return text.replace(/([\,;])/g, '\\$1');
+        }
+
+        function escapeGroups(groups) {
+            return groups.split(',').map(group => group.trim()).join(', ');
+        }
+
+        function formatDate(date) {
+            const pad = (num) => (num < 10 ? '0' : '') + num;
+            const formattedDate = date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate()) +
+                'T' + pad(date.getUTCHours()) + pad(date.getUTCMinutes()) + pad(date.getUTCSeconds()) + 'Z';
+            return formattedDate;
+        }
+
+        function convertToICal(event) {
+            const escapedGroups = escapeGroups(event.groups);
+            const lecturer = event.lecturer.length > 0 ? event.lecturer.join(', ') : '-';
+            const description = event.description !== null ? event.description : '-';
+
+            return `BEGIN:VEVENT
+UID:${event.UID}
+SUMMARY:${escapeText(event.title)}
+DTSTART:${formatDate(new Date(event.start))}
+DTEND:${formatDate(new Date(event.end))}
+DESCRIPTION:Course Code: ${event.courseCode}\\nCourse Type: ${event.courseType}\\nLecturer: ${lecturer}\\nGroups: ${escapedGroups}\\nDescription: ${description}
+LOCATION:${escapeText(event.roomCode)}
+URL:${event.oisLink}
+CATEGORIES:${event.courseType}
+END:VEVENT`;
+        }
+
+        function convertEventsToICal(jsonData) {
+            const iCalEvents = jsonData.map(convertToICal);
+            return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OIS2ICAL//EN\r\n${iCalEvents.join('\r\n')}\r\nEND:VCALENDAR`;
+        }
+
+        document.getElementById('convertButton').addEventListener('click', function () {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const jsonData = JSON.parse(jsonInput);
+
+            const iCalData = convertEventsToICal(jsonData);
+            const blob = new Blob([iCalData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.download = 'calendar.ics';
+            downloadLink.style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>

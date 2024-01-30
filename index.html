@@ -33,6 +33,11 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: vertical;
+            margin-bottom: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         button {
@@ -54,17 +59,26 @@
             text-decoration: none;
             color: #007bff;
         }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
 <body>
     <div id="container">
         <h2>ÕIS to iCal Converter</h2>
-        <p>Convert calendar from student.taltech.ee to iCal</p>
+        <p>Convert calendar from student.taltech.ee to iCal (Last updated 01.2024)</p>
         <p>Paste your JSON data below:</p>
         <textarea id="jsonInput" rows="10" cols="50"></textarea>
         <br>
-        <button id="convertButton">Convert to iCal</button>
+        <div class="button-group">
+            <button id="convertButton">Convert to iCal</button>
+            <a href="https://github.com/ingmarsell/Ois2Ical" target="_blank" id="githubLink">View project on
+                GitHub</a>
+        </div>
         <a id="downloadLink" style="display: none;">Download iCal File</a>
     </div>
 

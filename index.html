@@ -88,6 +88,7 @@
             const escapedGroups = escapeGroups(event.groups);
             const lecturer = event.lecturer.length > 0 ? event.lecturer.join(', ') : '-';
             const description = event.description !== null ? event.description : '-';
+            const roomCode = event.roomCode !== null ? escapeText(event.roomCode) : '-';
 
             return `BEGIN:VEVENT
 UID:${event.UID}
@@ -95,7 +96,7 @@ SUMMARY:${escapeText(event.title)}
 DTSTART:${formatDate(new Date(event.start))}
 DTEND:${formatDate(new Date(event.end))}
 DESCRIPTION:Course Code: ${event.courseCode}\\nCourse Type: ${event.courseType}\\nLecturer: ${lecturer}\\nGroups: ${escapedGroups}\\nDescription: ${description}
-LOCATION:${escapeText(event.roomCode)}
+LOCATION:${escapeText(roomCode)}
 URL:${event.oisLink}
 CATEGORIES:${event.courseType}
 END:VEVENT`;
